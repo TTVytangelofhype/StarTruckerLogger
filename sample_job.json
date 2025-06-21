@@ -1,0 +1,8 @@
+{
+  "cargo": "Cryo Pods",
+  "origin": "Luna Base",
+  "destination": "Titan Station",
+  "distance": 19.3,
+  "payment": 7200,
+  "duration_minutes": 16.7
+}
