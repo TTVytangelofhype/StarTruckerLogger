@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <Company>TTVytangelofhype</Company>
+    <Authors>TTVytangelofhype</Authors>
+    <Product>StarTruckerLogger</Product>
+    <Description>StarTrucker Logger for Virtual Trucking — Do not redistribute without permission.</Description>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>StarTruckerLogger</RootNamespace>
+    <AssemblyName>StarTruckerLogger</AssemblyName>
+  </PropertyGroup>
+
+</Project>
