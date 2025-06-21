@@ -7,5 +7,5 @@ This license requires that reusers give credit to the creator. It allows reusers
 BY Credit must be given to you, the creator.
 SA Adaptations must be shared under the same terms.
 
-Welconme to My Fun Little Project for a game I enjoy please note this is not part of the wortk i do it was just a small little fun projectwhich you will have to manually add the job yourself till i cna get it automated this does go well for a VTC company on StarTrucker 
-Please read the license and not to remove any coding with hte dotted lines 
+Welcome to My Fun Little Project for a game I enjoy. Please note this is not part of the work, I did it was just a small fun project, which you will have to manually add the job yourself till I can get it automated. This does go well for a VTC company on StarTrucker 
+Please read the license and do not remove any coding with the dotted lines 
