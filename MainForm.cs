@@ -1,9 +1,8 @@
-// ------------------------------------------------------------
-// StarTruckerLogger © 2025 by TTVytangelofhype
-// You are free to modify the code, but not to remove credit,
-// redistribute under your name, or sell it as your own.
-// ------------------------------------------------------------
+// File: MainForm.cs
+// Description: The main job logging window.
+
 using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StarTruckerLogger
@@ -20,7 +19,8 @@ namespace StarTruckerLogger
 
         public MainForm()
         {
-            this.Text = "Star Trucker Logger";
+            // Update the title to show who is logged in
+            this.Text = $"Star Trucker Logger - [{ApiClient.CurrentUser.Username}]";
             this.Width = 400;
             this.Height = 300;
 
@@ -36,10 +36,10 @@ namespace StarTruckerLogger
             txtDistance = new TextBox { Left = 120, Top = 110, Width = 200 };
             txtPayment = new TextBox { Left = 120, Top = 140, Width = 200 };
 
-            btnLogJob = new Button { Text = "Log Job", Left = 50, Top = 180, Width = 120 };
-            btnViewLog = new Button { Text = "View Logs", Left = 200, Top = 180, Width = 120 };
+            btnLogJob = new Button { Text = "Log Job to VTC", Left = 50, Top = 180, Width = 120 };
+            btnViewLog = new Button { Text = "View Local Logs", Left = 200, Top = 180, Width = 120 };
 
-            btnLogJob.Click += btnLogJob_Click;
+            btnLogJob.Click += async (s, e) => await btnLogJob_Click();
             btnViewLog.Click += btnViewLog_Click;
 
             this.Controls.Add(new Label { Text = "Cargo:", Left = 20, Top = 20 });
@@ -48,32 +48,55 @@ namespace StarTruckerLogger
             this.Controls.Add(txtOrigin);
             this.Controls.Add(new Label { Text = "Destination:", Left = 20, Top = 80 });
             this.Controls.Add(txtDestination);
-            this.Controls.Add(new Label { Text = "Distance:", Left = 20, Top = 110 });
+            this.Controls.Add(new Label { Text = "Distance (LY):", Left = 20, Top = 110 });
             this.Controls.Add(txtDistance);
-            this.Controls.Add(new Label { Text = "Payment:", Left = 20, Top = 140 });
+            this.Controls.Add(new Label { Text = "Payment (Cr):", Left = 20, Top = 140 });
             this.Controls.Add(txtPayment);
 
             this.Controls.Add(btnLogJob);
             this.Controls.Add(btnViewLog);
         }
 
-        private void btnLogJob_Click(object sender, EventArgs e)
+        private async Task btnLogJob_Click()
         {
-            string cargo = txtCargo.Text;
-            string origin = txtOrigin.Text;
-            string destination = txtDestination.Text;
-            string distance = txtDistance.Text;
-            string payment = txtPayment.Text;
+            btnLogJob.Text = "Syncing...";
+            btnLogJob.Enabled = false;
 
-            string log = $"[{DateTime.Now}] | Cargo: {cargo} | From: {origin} -> {destination} | Distance: {distance} LY | Pay: {payment} cr";
-            JobLogger.LogToFile(log);
-            MessageBox.Show("Job logged!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Log to the website via the API
+            bool success = await ApiClient.LogJobAsync(
+                txtOrigin.Text,
+                txtDestination.Text,
+                txtCargo.Text,
+                txtDistance.Text,
+                txtPayment.Text
+            );
+
+            if (success)
+            {
+                MessageBox.Show("Job successfully synced with the VTC portal!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Also log locally as a backup
+                string log = $"[SYNCED] [{DateTime.Now}] | Cargo: {txtCargo.Text} | From: {txtOrigin.Text} -> {txtDestination.Text}";
+                JobLogger.LogToFile(log);
+                // Clear fields for next job
+                txtCargo.Clear();
+                txtOrigin.Clear();
+                txtDestination.Clear();
+                txtDistance.Clear();
+                txtPayment.Clear();
+            }
+            else
+            {
+                MessageBox.Show("Failed to sync job with the VTC portal. Please check your connection and try again.", "Sync Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            btnLogJob.Text = "Log Job to VTC";
+            btnLogJob.Enabled = true;
         }
 
         private void btnViewLog_Click(object sender, EventArgs e)
         {
             var logs = JobLogger.ReadAll();
-            MessageBox.Show(string.Join(Environment.NewLine, logs), "Job Logs");
+            MessageBox.Show(string.Join(Environment.NewLine, logs), "Local Job Logs");
         }
     }
 }

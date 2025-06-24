@@ -1,8 +1,6 @@
-﻿// ------------------------------------------------------------
-// StarTruckerLogger © 2025 by TTVytangelofhype
-// You are free to modify the code, but not to remove credit,
-// redistribute under your name, or sell it as your own.
-// ------------------------------------------------------------
+﻿// File: Program.cs
+// Description: Main entry point for the application.
+
 using System;
 using System.Windows.Forms;
 
@@ -13,9 +11,17 @@ namespace StarTruckerLogger
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles(); // Optional but recommended
-            Application.SetCompatibleTextRenderingDefault(false); // Also optional
-            Application.Run(new MainForm()); // Start the GUI
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            // Show the login form as a dialog
+            var loginForm = new LoginForm();
+            if (loginForm.ShowDialog() == DialogResult.OK)
+            {
+                // If login was successful, open the main application window
+                Application.Run(new MainForm());
+            }
+            // If login fails or is cancelled, the application will exit.
         }
     }
 }
