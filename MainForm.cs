@@ -1,102 +1,75 @@
-// File: MainForm.cs
-// Description: The main job logging window.
-
-using System;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
 
-namespace StarTruckerLogger
+public partial class MainForm : Form
 {
-    public class MainForm : Form
+    public MainForm()
     {
-        private TextBox txtCargo;
-        private TextBox txtOrigin;
-        private TextBox txtDestination;
-        private TextBox txtDistance;
-        private TextBox txtPayment;
-        private Button btnLogJob;
-        private Button btnViewLog;
+        InitializeComponent();
+        InitializeCustomComponents();
+    }
 
-        public MainForm()
-        {
-            // Update the title to show who is logged in
-            this.Text = $"Star Trucker Logger - [{ApiClient.CurrentUser.Username}]";
-            this.Width = 400;
-            this.Height = 300;
+    private void InitializeCustomComponents()
+    {
+        // Set the form properties for a borderless window
+        this.FormBorderStyle = FormBorderStyle.None;
+        this.BackColor = Color.Black;
+        this.Size = new Size(800, 600); // Adjust as needed
+        this.StartPosition = FormStartPosition.CenterScreen;
 
-            InitializeControls();
-            JobWatcher.StartWatching();
-        }
+        // Create a custom panel for the main window frame
+        Panel mainFramePanel = new Panel();
+        mainFramePanel.Dock = DockStyle.Fill;
+        mainFramePanel.BackgroundImage = Properties.Resources.MetalFrameTexture; // Replace with your frame image
+        mainFramePanel.BackgroundImageLayout = ImageLayout.Stretch;
+        this.Controls.Add(mainFramePanel);
 
-        private void InitializeControls()
-        {
-            txtCargo = new TextBox { Left = 120, Top = 20, Width = 200 };
-            txtOrigin = new TextBox { Left = 120, Top = 50, Width = 200 };
-            txtDestination = new TextBox { Left = 120, Top = 80, Width = 200 };
-            txtDistance = new TextBox { Left = 120, Top = 110, Width = 200 };
-            txtPayment = new TextBox { Left = 120, Top = 140, Width = 200 };
+        // Create a panel for the content (the space view and UI)
+        Panel contentPanel = new Panel();
+        contentPanel.Size = new Size(760, 560); // Adjust to fit inside the frame
+        contentPanel.Location = new Point(20, 20); // Position inside the frame
+        contentPanel.BackColor = Color.Black;
+        contentPanel.BackgroundImage = Properties.Resources.SpaceBackground; // Replace with your space background
+        contentPanel.BackgroundImageLayout = ImageLayout.Zoom;
+        mainFramePanel.Controls.Add(contentPanel);
 
-            btnLogJob = new Button { Text = "Log Job to VTC", Left = 50, Top = 180, Width = 120 };
-            btnViewLog = new Button { Text = "View Local Logs", Left = 200, Top = 180, Width = 120 };
+        // Add a panel for the "Cargo Manifest" display
+        Panel manifestPanel = new Panel();
+        manifestPanel.Size = new Size(300, 100); // Adjust size
+        manifestPanel.Location = new Point(30, 30); // Position within the content panel
+        manifestPanel.BackColor = Color.FromArgb(20, 20, 20); // Dark background
+        manifestPanel.BorderStyle = BorderStyle.FixedSingle;
+        contentPanel.Controls.Add(manifestPanel);
 
-            btnLogJob.Click += async (s, e) => await btnLogJob_Click();
-            btnViewLog.Click += btnViewLog_Click;
+        // Add a Label for "CARGO MANIFEST v.2.7"
+        Label manifestTitleLabel = new Label();
+        manifestTitleLabel.Text = "CARGO MANIFEST v.2.7";
+        manifestTitleLabel.ForeColor = Color.LimeGreen;
+        manifestTitleLabel.Font = new Font("Consolas", 12, FontStyle.Regular);
+        manifestTitleLabel.AutoSize = true;
+        manifestTitleLabel.Location = new Point(10, 10);
+        manifestPanel.Controls.Add(manifestTitleLabel);
 
-            this.Controls.Add(new Label { Text = "Cargo:", Left = 20, Top = 20 });
-            this.Controls.Add(txtCargo);
-            this.Controls.Add(new Label { Text = "Origin:", Left = 20, Top = 50 });
-            this.Controls.Add(txtOrigin);
-            this.Controls.Add(new Label { Text = "Destination:", Left = 20, Top = 80 });
-            this.Controls.Add(txtDestination);
-            this.Controls.Add(new Label { Text = "Distance (LY):", Left = 20, Top = 110 });
-            this.Controls.Add(txtDistance);
-            this.Controls.Add(new Label { Text = "Payment (Cr):", Left = 20, Top = 140 });
-            this.Controls.Add(txtPayment);
+        // Add a Label for the route
+        Label routeLabel = new Label();
+        routeLabel.Text = "ROUTE: EPSILON-7 -> ANDROMDA PRIME";
+        routeLabel.ForeColor = Color.LimeGreen;
+        routeLabel.Font = new Font("Consolas", 10, FontStyle.Regular);
+        routeLabel.AutoSize = true;
+        routeLabel.Location = new Point(10, 40);
+        manifestPanel.Controls.Add(routeLabel);
 
-            this.Controls.Add(btnLogJob);
-            this.Controls.Add(btnViewLog);
-        }
+        // Implement the minimize, maximize, and close buttons
+        // You would need to create custom button images or draw them
+        // Here, we'll just use simple buttons for demonstration
+        Button closeButton = new Button();
+        closeButton.Text = "X";
+        closeButton.Location = new Point(this.Width - 40, 5);
+        closeButton.Click += (sender, e) => { this.Close(); };
+        mainFramePanel.Controls.Add(closeButton);
 
-        private async Task btnLogJob_Click()
-        {
-            btnLogJob.Text = "Syncing...";
-            btnLogJob.Enabled = false;
-
-            // Log to the website via the API
-            bool success = await ApiClient.LogJobAsync(
-                txtOrigin.Text,
-                txtDestination.Text,
-                txtCargo.Text,
-                txtDistance.Text,
-                txtPayment.Text
-            );
-
-            if (success)
-            {
-                MessageBox.Show("Job successfully synced with the VTC portal!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                // Also log locally as a backup
-                string log = $"[SYNCED] [{DateTime.Now}] | Cargo: {txtCargo.Text} | From: {txtOrigin.Text} -> {txtDestination.Text}";
-                JobLogger.LogToFile(log);
-                // Clear fields for next job
-                txtCargo.Clear();
-                txtOrigin.Clear();
-                txtDestination.Clear();
-                txtDistance.Clear();
-                txtPayment.Clear();
-            }
-            else
-            {
-                MessageBox.Show("Failed to sync job with the VTC portal. Please check your connection and try again.", "Sync Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            btnLogJob.Text = "Log Job to VTC";
-            btnLogJob.Enabled = true;
-        }
-
-        private void btnViewLog_Click(object sender, EventArgs e)
-        {
-            var logs = JobLogger.ReadAll();
-            MessageBox.Show(string.Join(Environment.NewLine, logs), "Local Job Logs");
-        }
+        // Add more UI elements as needed based on the design
+        // For example, you would add PictureBox controls to hold images
+        // and other labels or text boxes for different sections.
     }
 }
