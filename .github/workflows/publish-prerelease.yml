@@ -18,7 +18,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view v0.1.0-beta.1 >/dev/null 2>&1 && { echo "Release already exists; refusing to overwrite."; exit 1; }
+          if gh release view v0.1.0-beta.1 >/dev/null 2>&1; then
+            echo "Release already exists; refusing to overwrite."
+            exit 1
+          fi
           gh release create v0.1.0-beta.1 \
             --target "$(git rev-parse HEAD)" \
             --title "StarTruckerLogger v0.1.0-beta.1 — Compatibility Preview" \
