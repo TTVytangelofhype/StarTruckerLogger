@@ -1,0 +1,26 @@
+name: Publish StarTruckerLogger pre-release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+      - name: Publish v0.1.0-beta.1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v0.1.0-beta.1 >/dev/null 2>&1 && { echo "Release already exists; refusing to overwrite."; exit 1; }
+          gh release create v0.1.0-beta.1 \
+            --target "$(git rev-parse HEAD)" \
+            --title "StarTruckerLogger v0.1.0-beta.1 — Compatibility Preview" \
+            --notes-file .github/release-notes/v0.1.0-beta.1.md \
+            --prerelease
