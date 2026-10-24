@@ -15,7 +15,7 @@ if (args.Length == 0)
 if (args[0].Equals("host", StringComparison.OrdinalIgnoreCase))
 {
     int port = args.Length > 1 ? int.Parse(args[1]) : 7777;
-    using var listener = new TcpListener(IPAddress.Any, port);
+    var listener = new TcpListener(IPAddress.Any, port);
     listener.Start();
     Console.WriteLine($"VTC room on TCP {port}. Only allow trusted VPN peers.");
     var clients = new List<TcpClient>();
