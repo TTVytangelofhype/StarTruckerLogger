@@ -7,7 +7,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <StartupObject>StarTruckerLogger.Program</StartupObject>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>StarTruckerLogger</RootNamespace>
     <AssemblyName>StarTruckerLogger</AssemblyName>
